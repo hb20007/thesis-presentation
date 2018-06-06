@@ -1,0 +1,720 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Greek Dialect Classifier</title>
+
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+        <link rel="stylesheet" href="css/reveal-override.css">
+
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+                    <h1><small>A Classifier to Distinguish Between Cypriot Greek and Standard Modern Greek</small></h1>
+                    <br>
+                    <h2><small class="gray">Hanna Sababa</small></h2>
+                </section>
+                
+				<section>
+					<h2>The idea</h2>
+					<img src="img/hanna.jpg" alt="Thought bubble">
+                </section>
+
+                <section>
+                    <h2>Overview</h2>
+                    <ol>
+                        <li><a href="#/3">Introduction</a></li>
+                        <li><a href="#/5">Classification</a></li>
+                        <li><a href="#/8">Literature review</a></li>
+                        <li><a href="#/9">Data collection</a></li>
+                        <li><a href="#/10">System architecture</a></li>
+                        <li><a href="#/14">Experimental results</a></li>
+                        <li><a href="#/15">Conclusion and future work</a></li>
+                    </ol>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Introduction</h2>
+                        <h2 class="gray fragment">Linguistic background</h2>
+                    </section>
+
+                    <section>
+                        <h2>Language vs Dialect</h2>
+                        <div class="fragment">
+                            <p class="fragment strike">Written or not?</p>
+                            <p class="fragment strike">Linguistic similarity?</p>
+                            <p class="fragment strike">Mutual intelligibility?</p>
+                            <p class="fragment">Politics</p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Common Turkic languages</h2>
+                        <img src="img/turkic.png" alt="Common Turkic languages words">
+                    </section>
+
+                    <section>
+                        <h2>Arabic dialects</h2>
+                        <img src="img/arabic.png" alt="Arabic dialect words">
+                    </section>
+
+                    <section>
+                        <h2>Dialect continuum</h2>
+                        <img src="img/continuum.jpg" alt="Dialect continua in Europe">
+                    </section>
+
+                    <section>
+                        <h2 class="text-md">Dialect continua → Languages</h2>
+                        <i class="fas fa-arrow-right"></i>
+                        <blockquote class="fragment" data-fragment-index="0">&ldquo;Most languages have arisen out of dialect continuum situations and are considered separate languages for reasons that are by no means entirely linguistic.&rdquo;</blockquote>
+                        <p class="text-right fragment" data-fragment-index="0">Peter Trudgill (1997)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </section>
+
+                    <section>
+                        <h2>Dialects are important</h2>
+                        <ul>
+                            <li class="fragment">As much variation as languages</li>
+                            <li class="fragment">Widespread usage</li>
+                            <li class="fragment">Use in education enhances children's development</li>
+                            <li class="fragment">Source of a sense of identity</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Greek dialects</h2>
+                        <img src="img/greek.jpg" alt="Hellenic languages" height="450px">
+                    </section>
+
+                    <section>
+                        <h2>Cypriot Greek (CG)</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0">Diglossia in Cyprus: CG vs SMG</li>
+                            <li class="fragment" data-fragment-index="1">CG is a dialect continuum</li>
+                            <li class="fragment" data-fragment-index="2">Basilectal vs mesolectal CG</li>
+                            <div class="text-center fragment" data-fragment-index="2"><img src="img/lects.jpg" alt="Basilects and mesolects"></div>
+                        </ul>
+                    </section>
+                    
+                    <section>
+                        <h2>Importance of CG</h2>
+                        <img src="img/academic.png" alt="Cypriot Greek promo">
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Introduction</h2>
+                        <h2 class="gray">Technical background</h2>
+                    </section>
+
+                    <section>
+                        <h2>Natural Language Processing (NLP)</h2>
+                        <ul>
+                            <li class="fragment">NLP research and applications:<ul>
+                                <li>Classifying text into categories</li>
+                                <li>Extracting info from text</li>
+                                <li>Tagging words with their parts of speech (POS)</li>
+                                <li>Analyzing sentence structure</li>
+                            </ul></li>
+                            <li class="fragment">Uses large bodies of text called <strong>corpora</strong></li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Social media as a data source</h2>
+                        <ul>
+                            <li>Facebook</li>
+                            <li>Twitter</li>
+                            <li>Comments on news articles and blogs</li>
+                            <li>Forum posts</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Classification</h2>
+                        <h2 class="gray fragment">Introduction</h2>
+                    </section>
+
+                    <section>
+                        <h2>Classification 101</h2>
+                        <ul>
+                            <li>Definition</li>
+                            <li class="fragment" data-fragment-index="0"><strong>Features</strong> and <strong>feature vectors</strong></li>
+                            <li class="fragment" data-fragment-index="1">$ n \times d $ data matrix with $ n $ training observations in $ d $-dimensional space:</li>
+                            <div class="text-center fragment" data-fragment-index="1"><img src="img/featurevec.png" alt="Feature vector"></div>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Classification</h2>
+                        <h2 class="gray">Classifiers</h2>
+                    </section>
+
+                    <section>
+                        <h2>Classifiers</h2>
+                        <ul>
+                            <li class="fragment">$ f(x): \mathbf{R}^d \rightarrow \mathbf{R} $</li>
+                            <li class="fragment">For binary classification: $\; f(x) \geq 0 $</li>
+                            <li class="fragment">Linear vs non-linear</li>
+                            <li class="fragment">Linear classifiers: <ul>
+                                <li>Naive Bayes (NB)</li>
+                                <li>Support Vector Machines (SVMs)</li>
+                                <li>Logistic Regression . . .</li>
+                            </ul></li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Linear classifiers</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0">Linear combination of characteristics</li>
+                            <li class="fragment" data-fragment-index="1">Training = Find weight vector</li>
+                            <li class="fragment" data-fragment-index="2">Linear classification boundary:</li>
+                            <img src="img/linsep.png" alt="linear boundary" class="fragment" data-fragment-index="2">
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Naive Bayes classifier</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0">Bayes' theorem:</li>
+                            <div class="text-center" class="fragment" data-fragment-index="0"><img src="img/nb.png" alt="Bayes' theorem" class="fragment" data-fragment-index="0"></div>
+                            <li class="fragment" data-fragment-index="1">Multiple evidences:</li>
+                            <div class="text-center" class="fragment" data-fragment-index="1"><img src="img/nb2.png" alt="Bayes' theorem with multiple evidences" class="fragment" data-fragment-index="1"></div>
+                            <li class="fragment" data-fragment-index="2">After naive assumption:</li>
+                            <div class="text-center" class="fragment" data-fragment-index="2"><img src="img/nb3.png" alt="Bayes' theorem with multiple evidences with naive assumption" class="fragment" data-fragment-index="2"></div>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Naive Bayes: Variations and advantages</h2>
+                        <ul>
+                            <li class="fragment">Variations:<ul>
+                                <li>Bernoulli NB</li>
+                                <li>Multinomial NB</li>
+                            </ul></li>
+                            <li class="fragment">Advantages:<ul>
+                                <li>Simple, easy to implement, fast</li>
+                                <li>Ideal when the dimension of the feature space is high</li>
+                            </ul></li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Support Vector Machines</h2>
+                        <p class="fragment">The term is used interchangeably to refer to the <strong>maximal margin classifier</strong>, the <strong>support vector classifier</strong> and the <strong>support vector machine</strong>.</p>
+                    </section>
+
+                    <section>
+                        <h2>Maximal margin classifier</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0"><strong>Hyperplane</strong> (Flat affine $ d - 1$ subspace):</li>
+                            <div class="text-center fragment" data-fragment-index="0"><img src="img/hyperplaneeq.png" alt="Hyperplane equation" class="fragment" data-fragment-index="0"></div>
+                            <li class="fragment" data-fragment-index=1"><strong>Separating hyperplane</strong></li>
+                            <div class="text-center fragment" data-fragment-index="1"><img src="img/hyperplane.png" alt="Separating hyperplane" class="fragment" data-fragment-index="1"></div>
+                            <li class="fragment" data-fragment-index=2"><strong>Maximal margin hyperplane</strong> ✓</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>What are support vectors?</h2>
+                        <div class="text-center"><img src="img/svm.png" alt="Support vectors"></div>
+                    </section>
+
+                    <section>
+                        <h2>Support vector classifier</h2>
+                        <ul>
+                            <li class="fragment">Generalization of maximal margin classifier for non-separable classes</li>
+                            <li class="fragment">Uses a <strong>soft margin</strong></li>
+                            <li class="fragment">Support vectors now include points on the wrong side of the margin</li>
+                            <li class="fragment">Good, but only for linear boundaries</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Support vector machine</h2>
+                        <ul>
+                            <li class="fragment">Allows feature space to be expanded with functions of predictors</li>
+                            <li class="fragment">Uses <strong>kernels</strong>
+                            <li class="fragment">Kernels are complex but make the feature space expansion efficient</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Linear SVC Pros and Cons</h2>
+                        <ul>
+                            <li class="fragment">Pros:<ul>
+                                <li>Easy to interpret meaning of features</li>
+                                <li>Can be extended for non-linear boundaries</li>
+                            </ul></li>
+                            <li class="fragment">Cons:<ul>
+                                <li>Higher memory and computing resource usage</li>
+                                <li>Multiclass classification is challenging</li>
+                            </ul></li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Logistic Regression</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0">Adaptation of linear regression for categorical independent variables</li>
+                            <li class="fragment" data-fragment-index="1">Need function with outputs in the range $ [0, 1] $:</li>
+                            <div class="text-center" class="fragment" data-fragment-index="1"><img src="img/log.png" alt="Logistic function" class="fragment" data-fragment-index="1"></div>
+                            <li class="fragment" data-fragment-index="2">Uses <strong>maximum likelihood estimation</strong> to fit the model</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Logistic regression: Considerations</h2>
+                        <ul>
+                            <li class="fragment">Can be extended for multiclass classification but not common in practice</li>
+                            <li class="fragment">Simpler than SVMs so try first if data is linearly separable</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Performance metrics (1)</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0">For binary classifier:
+                                <ul>
+                                    <li>True positives (TP)</li>
+                                    <li>True negatives (TN)</li>
+                                    <li>False positives (FP)</li>
+                                    <li>False negatives (FN)</li>
+                                </ul>
+                            </li>
+                            <li class="fragment" data-fragment-index="1"><strong>Confusion matrix</strong>:</li>
+                            <div class="text-center fragment" data-fragment-index="1"><img src="img/cm.png" alt="Confusion matrix" class="fragment" data-fragment-index="1"></div>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Performance metrics (2)</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="0"><strong>Accuracy</strong></li>
+                            <li class="fragment" data-fragment-index="1"><strong>Precision</strong> and <strong>recall</strong>:</li>
+                            <div class="text-center fragment" data-fragment-index="1"><img src="img/pr.png" alt="Precision and recall formulae" class="fragment" data-fragment-index="1"></div>
+                            <li class="fragment" data-fragment-index="2"><strong>$ F_1 $ score</strong>:</li>
+                            <div class="text-center fragment" data-fragment-index="2"><img src="img/f1.png" alt="F1 score formula" class="fragment" data-fragment-index="2" width="1000" height="100"></div>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Classification</h2>
+                        <h2 class="gray">Language classification</h2>
+                    </section>
+
+                    <section>
+                        <h2>Language Classification</h2>
+                        <ul>
+                            <li class="fragment">Features: words, parts of speech (POS), $ n $-grams</li>
+                            <li class="fragment">$ N $-grams: Groups of characters or words</li>
+                            <li class="fragment">$ N $-gram padding</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Discriminating between similar languages</h2>
+                        <ul>
+                            <li class="fragment">Bottleneck of state-of-the-art language classification</li>
+                            <li class="fragment">Standard classifiers not tuned for the problem fall short</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Technologies</h2>
+                        <img src="img/py.png" alt="Python logo" width="250" height="250" class="float-left">
+                        <img src="img/jupyter.jpg" alt="Jupyter logo" width="250" height="250">
+                        <img src="img/sklearn.png" alt="Sklearn logo" width="250" height="250" class="float-right">
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Literature review</h2>
+                    </section>
+
+                    <section>
+                        <h2>Research on language identification</h2>
+                        <ul>
+                            <li class="fragment">1970s: Pioneering work by Leonard and Doddington</li>
+                            <li class="fragment">1980s: Language recognition algorithm to identify 7 spoken languages</li>
+                            <li class="fragment">1990s: Cavnar and Trenkle use $ n $-grams for text categorization</li>
+                            <li class="fragment">2000s: Better computer power, algorithms. Many successes.</li>
+                            <li class="fragment">2010s: Multilingual documents, social media, neural networks.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Research on discriminating between similar languages</h2>
+                        <ul>
+                            <li class="fragment">Pre-2014: Malay vs Indonesian, South Slavic languages, European vs Brazilian Portuguese</li>
+                            <li class="fragment">2014: The Discriminating between Similar Languages (DSL) shared task</li>
+                            <li class="fragment">Post-2014: Czech vs Slovakian, Arabic dialects, Spanish dialects</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Research on NLP in the Greek languages</h2>
+                        <ul>
+                            <li>List of Greek stopwords</li>
+                            <li>Greek stemmer</li>
+                            <li>Greek POS tagger</li>
+                            <li>Tool for extracting multi-word Greek expressions</li>
+                            <li>Greek sentiment lexicon and sentiment analysis</li>
+                            <li>Whole suite of Greek NLP tools</li>
+                            <li>Review on using Python's NLTK library with Greek</li>
+                            <li>Identifying Greeklish in tweets and forums</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Data collection</h2>
+                    </section>
+
+                    <section>
+                        <h2>Data sources</h2>
+                        <ul>
+                            <li>Facebook pages and groups</li>
+                            <li>Twitter</li>
+                            <li>Blogs and forums</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Collection process</h2>
+                        <ul>
+                            <li class="fragment">No Greeklish, Latin characters, numbers, Cypriot diacritics</li>
+                            <li class="fragment">Twitter:<ul>
+                                <li>No retweets</li>
+                                <li>No reply tweets</li>
+                                <img src="img/kalimera.png" alt="Useless tweet">
+                                <li>Searching by seed words</li>
+                            </ul></li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">System architecture</h2>
+                        <h2 class="gray fragment">Overview</h2>
+                    </section>
+
+                    <section>
+                        <h2>Overview</h2>
+                        <img src="img/system.png" alt="System flowchart">
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">System architecture</h2>
+                        <h2 class="gray">Corpus</h2>
+                    </section>
+
+                    <section>
+                        <h2>Corpus content</h2>
+                        <ul>
+                            <li>Structure: <br>
+                                <img src="img/corpus.png" alt="Corpus files"> <!-- Better to have images inside list items -->
+                            </li>
+                            <li>CG Features: Mostly mesolectal, a few basilectal</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Data preprocessing</h2>
+                        <ol>
+                            <li>Before text was stored in corpus</li>
+                            <li>When text is loaded from corpus to prepare for sentence tokenization</li>
+                            <li>After sentence tokenization, full preprocessing</li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h2>Preprocessing Step 1</h2>
+                        <ul>
+                            <li class="fragment">Purpose: Each tweet or comment should span one line in the text file</li>
+                            <li class="fragment">All groups of whitespace replaced by a single space</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Preprocessing Step 2</h2>
+                        <ul>
+                            <li class="fragment">Purpose: Optimization for sentence tokenizer</li>
+                            <li class="fragment">Remove duplicate consecutive punctuation</li>
+                            <li class="fragment">Insert missing spaces between sentences</li>
+                            <li class="fragment">Break down text into lines</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Preprocessing Step 3</h2>
+                        <ul>
+                            <li class="fragment">Remove URLs, HTML entity references, emojis</li>
+                            <li class="fragment">Strip Greek accents</li>
+                            <li class="fragment">Remove Twitter-specific tags</li>
+                            <li class="fragment">Convert to lowercase</li>
+                            <li class="fragment">Remove all punctuation except for in ό,τι</li>
+                            <li class="fragment">Remove left-over spaces</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Text analysis</h2>
+                    </section>
+
+                    <section>
+                        <h2>Corpus statistics</h2>
+                        <blockquote>
+                            <strong>1039 sentences, 14126 words</strong><br>
+                            7026 words in CG data<br>
+                            7100 words in SMG data<br>
+                        </blockquote>
+                    </section>
+
+                    <section>
+                        <h2>Top 10 CG and SMG words</h2>
+                        <img src="img/cgwords.png" alt="Most frequent CG words" width="476">
+                        <img src="img/smgwords.png" alt="Most frequent SMG words" width="476" height="344">
+                    </section>
+
+                    <section>
+                        <h2>Top 10 CG and SMG characters</h2>
+                        <img src="img/cgchars.png" alt="Most frequent CG chars" width="476" height="344">
+                        <img src="img/smgchars.png" alt="Most frequent SMG chars" width="476" height="344">
+                    </section>
+
+                    <section>
+                        <h2>Top 10 CG and SMG word 2-grams</h2>
+                        <img src="img/cgword2grams.png" alt="Most frequent CG word 2-grams" width="476" height="344">
+                        <img src="img/smgword2grams.png" alt="Most frequent SMG word 2-grams" width="476" height="344">
+                    </section>
+
+                    <section>
+                        <h2>Top 10 CG and SMG character 2-grams</h2>
+                        <img src="img/cgchar2grams.png" alt="Most frequent CG char 2-grams" width="476" height="344">
+                        <img src="img/smgchar2grams.png" alt="Most frequent SMG char 2-grams" width="476" height="344">
+                    </section>
+
+                    <section>
+                        <h2>Top 10 CG and SMG character 3-grams</h2>
+                        <img src="img/cgchar3grams.png" alt="Most frequent CG char 2-grams" width="476" height="344">
+                        <img src="img/smgchar3grams.png" alt="Most frequent SMG char 2-grams" width="476" height="344">
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">System architecture</h2>
+                        <h2 class="gray">Feature extraction</h2>
+                    </section>
+
+                    <section>
+                        <h2>Features</h2>
+                        <ul>
+                            <li class="fragment">Features used:<ul>
+                                <li>Words</li>
+                                <li>Characters</li>
+                                <li>Word bigrams (no padding)</li>
+                                <li>Character bigrams</li>
+                                <li>Character trigrams</li></ul>
+                            </li>
+                            <li class="fragment">Optimization: Final sigma elimination in character $ n $-grams</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Feature extraction process</h2>
+                        <ol>
+                            <li>Get word tokens using whitespace tokenizer</li>
+                            <li>Build feature dictionaries</li>
+                            <li>Vectorize feature dictionary</li>
+                        </ol>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">System architecture</h2>
+                        <h2 class="gray">Building the classifiers</h2>
+                    </section>
+
+                    <section>
+                        <h2>How the classifiers were built</h2>
+                        <ol>
+                            <li>Split data into training (80%) and test (20%) sets</li>
+                            <li>Training feature vectors and labels are used to fit 3 classifiers:</li><ul>
+                                <li>Multinomial NB</li>
+                                <li>Linear SVC</li>
+                                <li>Logistic regression</li>
+                            </ul>
+                            <li>Feature sampling is done automatically by Scikit-learn's classifiers</li>
+                        </ol>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Experimental results</h2>
+                    </section>
+
+                    <section>
+                        <h2>Comparing the classifiers</h2>
+                        <ul>
+                            <li class="fragment">Mean accuracy with different classifiers:<br>
+                                <img src="img/accuracy.png" alt="Classifier accuracies">
+                            </li>
+                            <li class="fragment">Accuracy and $ F_1 $ score were very similar</li>
+                            <li class="fragment">Best classifier: Multinomial NB</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>NB Performance metrics</h2>
+                        <ul>
+                            <li class="fragment">NB confusion matrix:<br>
+                                <div class="text-center"><img src="img/cmatrix.png" alt="NB confusion matrix"></div>
+                            </li>
+                            <li class="fragment">NB precision, accuracy, $ F_1 $ score:<br>
+                                <div class="text-center"><img src="img/metrics.png" alt="NB confusion matrix"></div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>NB Most informative features</h2>
+                        <img src="img/mosti.png" alt="Most informative NB features" height="450px">
+                    </section>
+
+                    <section>
+                        <h2>Experiments conducted on features</h2>
+                        <ol>
+                            <li>Removing padding for character $ n $-grams</li>
+                            <li>Using only character $ n $-gram features</li>
+                            <li>Ignoring words that appear in less than 1% of data</li>
+                            <li>Considering only the 300 most popular features</li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h2>Error analysis</h2>
+                        <ul>
+                            <li class="fragment">Multinomial NB made 8 errors, linear SVC made 20 errors and logistic regression made 16 errors</li>
+                            <li class="fragment">Out of Multinoial NB's 8 errors, 5 were also made by the other 2 classifiers</li>
+                            <li class="fragment">Small corpus size and not using POS features were found to be the causes</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2 class="text-xl">Conclusion and future work</h2>
+                    </section>
+
+                    <section>
+                        <h2>Conclusion</h2>
+                        <ul>
+                            <li class="fragment">Successfully built a CG-SMG classifier in Python with 95% mean accuracy</li>
+                            <li class="fragment">Classifier and corpus distributed open source on Github</li>
+                            <li class="fragment">Classifier has several applications on its own or in building other products</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Direct Applications</h2>
+                    </section>
+
+                    <section>
+                        <h2>Social media moderation</h2>
+                        <img src="img/fbreport.png" alt="Facebook report feature">
+                    </section>
+                    
+                    <section>
+                        <img src="img/sadiqKhan.png" alt="Sadiq Khan article">
+                    </section>
+
+                    <section>
+                        <h2>Future applications</h2>
+                    </section>
+                    
+                    <section>
+                        <img src="img/fb.png" alt="Facebook comment 1" width="650px">
+                        <img src="img/fb2.png" alt="Facebook comment 2" width="650px">
+                        <img src="img/fb3.png" alt="Facebook comment 3" width="650px">
+                        <img src="img/twitter.png" alt="Greeklish Tweet" width="650px">
+                    </section>
+
+                    <section>
+                        <img src="img/translate.png" alt="Google translate 1">
+                        <img src="img/translate4.png" alt="Google translate 2">
+                    </section>
+
+                    <section>
+                        <img src="img/ytsubs.png" alt="Youtube subtitles">
+                    </section>
+                    
+                    <section>
+                        <img src="img/duplex.jpg" alt="Google Duplex">
+                    </section>
+
+                    <section>
+                        <h2>Future work</h2>
+                        <ul>
+                            <li class="fragment">Extending classifier to work with Greeklish</li>
+                            <li class="fragment">Translators that identify the Greek variety first<ul>
+                                <li class="fragment">Useful for CG researchers and learners</li>
+                                <li class="fragment">Useful for immigrants such as domestic workers</li>
+                            </ul></li>
+                            <li class="fragment">Work on speech</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <h2 class="text-xl">Thank you</h2>
+                </section>
+            </div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+                transition: 'convex',
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/math/math.js', async: true }
+                ]
+			});
+		</script>
+	</body>
+</html>
